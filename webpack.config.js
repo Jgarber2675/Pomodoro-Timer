@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 //const babel = require("@babel");
 
 const bundleObj = {
-  mode: process.env.NODE_ENV || 'production',
+  mode: 'production',
   entry: './client/index',
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -28,7 +28,7 @@ const bundleObj = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'build/index.html'),
+      template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html',
     }),
   ],
@@ -36,9 +36,6 @@ const bundleObj = {
     static: {
       directory: path.join(__dirname, 'client'),
       publicPath: '/',
-    },
-    proxy: {
-      '/api': 'http://localhost:3000',
     },
   },
 };
