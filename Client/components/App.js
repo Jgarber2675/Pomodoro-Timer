@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
 import TimerDisplay from './TimerDisplay';
+import UserLogin from './UserLogin';
 
-const TIME_25MIN = 1500000;
-const TIME_15MIN = 900000;
-const TIME_5MIN = 300000;
+const MIN_TO_MS = 60000;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: TIME_25MIN, //25 minutes in ms
-      break: false
+      time: 25 * MIN_TO_MS, //25 minutes in ms
+      break: false,
+      Username:'Username',
+      Password:'Password',
+      pomodoroTime:25,
+      shortBreak:5,
+      longBreak:10,
+      timerID : undefined
     }
+
     this.startTimer = this.startTimer.bind(this);
-    this.handleClick = this.handleClick.bind(this);
     this.skipTimer = this.skipTimer.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChangePassword = this.handleChangePassword.bind(this);
+    this.handleChangeUsername = this.handleChangeUsername.bind(this);
+
   }
 
   startTimer(time, isBreak){
+    if (this.state.timerID) clearTimeout(this.state.timerID);
     this.setState({
       time: time,
       break: isBreak
@@ -26,7 +36,8 @@ class App extends Component {
     const timerID = setInterval(()=>{
       this.setState({
         time: this.state.time - 1000,
-        break: isBreak
+        break: isBreak,
+        timerID: timerID
       });
       if (this.state.time <= 0) clearInterval(timerID);
       console.log(this.state.time);
@@ -34,26 +45,52 @@ class App extends Component {
   }
 
   skipTimer(){
+    clearTimeout(this.state.timerID);
     this.setState({
       time:0,
-      break:false
+      break:false,
+      timerID:undefined
     });
   }
 
-  handleClick(){
-    alert('Handle Click');
+
+  handleChangeUsername(event){
+    this.setState({Username: event.target.value});
+  }
+  handleChangePassword(event){
+    this.setState({Password: event.target.value});
+  }
+
+  handleSubmit(){
+    const str = '../user/?'+  new URLSearchParams({
+      username:this.state.Username,
+      password:this.state.Password
+    });
+    
+    fetch(str)
+      .then(res => res.json())
+      .then(data => {
+        this.setState({
+          pomodoroTime:data.pomodoroTime,
+          shortBreak:data.shortBreak,
+          longBreak:data.longBreak,
+        });
+      })
+      .catch(err => next(err));
   }
   
-  //; this.startTimer(1500000,false)
   render() {
     return (
       <>
       <div style={{zIndex:-1}}>
         <TimerDisplay time={this.state.time} breaktime={this.state.break}/>
-        <button onClick= {() => this.startTimer(TIME_25MIN,false)} style={{zIndex:1}}>25 Minutes</button>
-        <button onClick={() => this.startTimer(TIME_5MIN,true)} style={{zIndex:1}}>5 Minute Break</button>
-        <button onClick={() => this.startTimer(TIME_15MIN,true)} style={{zIndex:1}}>15 Minute Break</button>
+        <button onClick= {() => this.startTimer(this.state.pomodoroTime * MIN_TO_MS,false)} style={{zIndex:1}}>Start Pomodoro</button>
+        <button onClick={() => this.startTimer(this.state.shortBreak * MIN_TO_MS,true)} style={{zIndex:1}}>Short Break</button>
+        <button onClick={() => this.startTimer(this.state.longBreak * MIN_TO_MS,true)} style={{zIndex:1}}>Long Break</button>
         <button onClick={() => this.skipTimer()} style={{zIndex:1}}>Skip Remaining Time</button>
+      </div>
+      <div>
+        <UserLogin handleChangePassword ={this.handleChangePassword} handleChangeUsername ={this.handleChangeUsername} handleSubmit={this.handleSubmit} Username={this.state.Username} Password={this.state.Password}></UserLogin>
       </div>
       </>
     );
