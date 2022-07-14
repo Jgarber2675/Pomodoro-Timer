@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const bundleObj = {
   mode: 'production',
-  entry: './client/index',
+  entry: './Client/index',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
@@ -33,10 +33,10 @@ const bundleObj = {
     }),
   ],
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'client'),
-      publicPath: '/',
-    },
+    // static: {
+    //   directory: path.join(__dirname, 'client'),
+    //   publicPath: '/',
+    // },
   },
 };
 

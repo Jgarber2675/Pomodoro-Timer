@@ -14,9 +14,14 @@ class App extends Component {
     }
     this.startTimer = this.startTimer.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.skipTimer = this.skipTimer.bind(this);
   }
 
   startTimer(time, isBreak){
+    this.setState({
+      time: time,
+      break: isBreak
+    })
     console.log('timer started');
     const timerID = setInterval(()=>{
       this.setState({
@@ -25,7 +30,14 @@ class App extends Component {
       });
       if (this.state.time <= 0) clearInterval(timerID);
       console.log(this.state.time);
-    },time);
+    },1000);
+  }
+
+  skipTimer(){
+    this.setState({
+      time:0,
+      break:false
+    });
   }
 
   handleClick(){
@@ -35,12 +47,15 @@ class App extends Component {
   //; this.startTimer(1500000,false)
   render() {
     return (
+      <>
       <div style={{zIndex:-1}}>
-        <TimerDisplay time={this.state.time}/>
-        <button onClick= {() => {console.log('button clicked');}} style={{zIndex:1}}>25 Minutes</button>
-        <button onClick={this.handleClick}>5 Minute Break</button>
-        <button onClick={() =>{this.startTimer(TIME_15MIN,true)}}>15 Minute Break</button>
+        <TimerDisplay time={this.state.time} breaktime={this.state.break}/>
+        <button onClick= {() => this.startTimer(TIME_25MIN,false)} style={{zIndex:1}}>25 Minutes</button>
+        <button onClick={() => this.startTimer(TIME_5MIN,true)} style={{zIndex:1}}>5 Minute Break</button>
+        <button onClick={() => this.startTimer(TIME_15MIN,true)} style={{zIndex:1}}>15 Minute Break</button>
+        <button onClick={() => this.skipTimer()} style={{zIndex:1}}>Skip Remaining Time</button>
       </div>
+      </>
     );
   }
 }
